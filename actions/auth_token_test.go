@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry-incubator/credhub-cli/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/cloudfoundry-incubator/credhub-cli/errors"
 )
 
 var _ = Describe("Token", func() {
@@ -59,6 +60,18 @@ var _ = Describe("Token", func() {
 
 			token, _ := subject.GetAuthTokenByClientCredential("test_client", "test_secret")
 			Expect(token.AccessToken).To(Equal("3YotnFZFEjr1zCsicMWpAA"))
+		})
+	})
+
+	Describe("VerifyAuthServerConnection", func() {
+		It("returns an error if no valid caCert exists for the auth server", func() {
+			httpClient.DoStub = func(req *http.Request) (resp *http.Response, err error) {
+				return nil, errors.NewCatchAllError()
+			}
+
+			error := actions.VerifyAuthServerConnection(&httpClient, testConfig)
+			Expect(error).ToNot(BeNil())
+
 		})
 	})
 })

@@ -372,6 +372,16 @@ var _ = Describe("API", func() {
 					cfg = config.ReadConfig()
 					Expect(cfg.CaCerts).To(Equal([]string{string(serverCa), string(authCa)}))
 				})
+
+				It("returns an error if no cert is valid for UAA", func() {
+					previousCfg := config.ReadConfig()
+					session := runCommand("api", "-s", server.URL(), "--ca-cert", "../test/server-tls-ca.pem")
+					Eventually(session).Should(Exit(1))
+					Eventually(session.Out).Should(ContainSubstring("certificate signed by unknown authority"))
+
+					cfg := config.ReadConfig()
+					Expect(cfg.CaCerts).To(Equal(previousCfg.CaCerts))
+				})
 			})
 		})
 

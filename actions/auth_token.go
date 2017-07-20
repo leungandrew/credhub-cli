@@ -45,3 +45,10 @@ func getAuthToken(serverInfo ServerInfo, request *http.Request) (models.Token, e
 
 	return *token, nil
 }
+
+func VerifyAuthServerConnection(httpClient client.HttpClient, config config.Config) error {
+	request, _ := http.NewRequest("GET", config.AuthURL + "/info", nil)
+	request.Header.Add("Accept", "application/json")
+	_, err := httpClient.Do(request)
+	return err
+}
